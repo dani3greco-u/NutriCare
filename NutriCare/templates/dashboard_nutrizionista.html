@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Area Gestione Nutrizionista</h1>
+
+    {% if nutrizionista.stato == "1" %}
+        <a href="{% url 'associa_paziente' %}" class="btn-add">+ Aggiungi Nuovo Paziente</a>
+        
+        
+        <h2>I tuoi Pazienti</h2>
+        <ul>
+            {% for p in pazienti %}
+                <div class="paziente-card">
+                    <a href="{% url 'dettaglio_paziente' p.email %}">{{ p.nome }} {{ p.cognome }}</a>
+                    <p>Email: {{ p.email }}</p>
+                </div>
+            {% empty %}
+                <li>Nessun paziente assegnato al momento.</li>
+            {% endfor %}
+        </ul>
+        
+
+        <h2>
+            Recensioni{% if recensioni %} ({{ media_voti }}/5.0){% endif %}
+        </h2>
+        <ul>
+            {% for r in recensioni %}
+                <div class="paziente-card" >
+                    <p>{{ r.paziente.nome }} {{r.paziente.cognome}}: {{ r.stelle }} stelle - "{{ r.commento }}"</p>
+                </div>
+                
+            {% empty %}
+                <li>Nessuna recensione al momento.</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Profilo non attivo</p>
+    {% endif %}
+
+{% endblock %}

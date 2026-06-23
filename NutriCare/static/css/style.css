@@ -1,0 +1,271 @@
+/* static/css/style.css */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Link dashboard */
+a[href*="dashboard"] {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #27ae60;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+a[href*="dashboard"]:hover {
+    color: #219150;
+    transform: translateX(-3px);
+}
+
+a[href*="gestisci_piano"] {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #27ae60;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+a[href*="gestisci_piano"]:hover {
+    color: #219150;
+    transform: translateX(-3px);
+}
+
+.return {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #27ae60;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.return:hover {
+    color: #219150;
+    transform: translateX(-3px);
+}
+
+.info-nutrizionista p {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.05rem;
+}
+.dashboard-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+
+.btn-add {
+    background-color: #27ae60;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.paziente-card {
+    border: 1px solid #dcdde1;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    transition: transform 0.2s;
+    border-left: 5px solid #27ae60
+}
+
+.paziente-card:hover {
+    background-color: #f9f9f9;
+    border-color: #3498db;
+}
+
+.paziente-card a {
+    color: #2980b9;
+    font-size: 1.2em;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    table-layout: fixed; /* Forza le colonne ad allinearsi */
+}
+
+th, td {
+    padding: 12px 15px; /* Padding uniforme */
+    text-align: center;   /* Allinea tutto a sinistra */
+    border-bottom: 1px solid #ddd;
+    word-wrap: break-word; /* Gestisce testi lunghi senza rompere il layout */
+}
+
+th {
+    background-color: #2c3e50;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+
+.table-form input, .table-form textarea {
+    width: 90%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.table-form th {
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px;
+}
+
+.errorlist {
+    color: #e74c3c;
+    font-size: 0.85em;
+    margin: 5px 0;
+    list-style: none;
+    font-weight: bold;
+}
+
+/* Centra la checkbox di eliminazione */
+.table-form td:first-child {
+    text-align: center;
+}
+
+/* Impedisci che la colonna Note sia troppo stretta */
+
+
+/* Stile per i messaggi di errore */
+.errorlist {
+    color: #c0392b;
+    font-weight: bold;
+    margin-top: 5px;
+    font-size: 0.9em;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+.alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.table-form th, .table-form td {
+    white-space: nowrap; /* Impedisce al testo di andare a capo */
+    padding: 8px 12px;   /* Aggiunge un po' di respiro tra le colonne */
+}
+
+.table-form {
+    width: auto;         /* La tabella non si allarga al 100% */
+    min-width: 100%;     /* Ma occupa almeno lo spazio disponibile */
+}
+
+/* Le colonne brevi si adattano */
+.table-form th:not(:last-child), 
+.table-form td:not(:last-child) {
+    white-space: nowrap;
+}
+
+/* La colonna note si espande se necessario */
+
+
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.login-container h2 { margin-bottom: 25px; color: #333; }
+
+.form-group { margin-bottom: 20px; text-align: left; }
+
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box; /* Importante per il padding */
+}
+
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-login:hover { background: #219150; }
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.table th, .table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+.table th { background-color: #f8f9fa; color: #2c3e50; }
+.btn-primary {
+    background-color: #27ae60;
+    color: white;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+.btn-primary:hover { background-color: #219150; }
+
+.modal-overlay {
+    display: none; /* Inizialmente nascosto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* Colore semi-trasparente */
+    backdrop-filter: blur(5px); /* Questo crea l'effetto sfocato */
+    z-index: 999; /* Appena sotto la modale */
+}
+

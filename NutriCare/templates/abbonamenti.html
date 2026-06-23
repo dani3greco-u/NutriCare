@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    
+    margin-top: 15px;
+}
+
+.btn-secondary {
+    background: #ccc;
+    color: black;
+}
+
+</style>
+<a href="{% url 'dashboard_paziente' %}">Torna alla dashboard</a>
+{% if not acquisto_scontato %}
+<div class="paziente-card">
+    <div class="referral-banner">
+        <h3>Sconto -20% con un amico</h3>
+
+        <p>Inserisci l'email o codice del tuo amico per attivare lo sconto per entrambi.</p>
+
+
+            {% csrf_token %}
+
+            <input type="text" name="partner_email" placeholder="Email amico">
+
+            <input type="hidden" name="partner_id" id="partner_id">
+
+            <button class="btn-add" type="button" onclick="cercaPartner()">
+                Verifica
+            </button>
+
+
+        <p id="referral_msg"></p>
+    </div>
+</div>
+{% endif %}
+<div class="paziente-card">    
+    {% if abbonamento_attivo %}
+
+        <div class="card-attivo">
+            <h3>Abbonamento attivo</h3>
+
+            <p>Nome: <strong>{{ abbonamento_attivo.abbonamento.nome }}</strong></p>
+                {% if abbonamento_attivo.abbonamento.descrizione %} 
+                    <p>Descrizione: <strong>{{ abbonamento_attivo.abbonamento.descrizione }}</strong></p>
+                {% endif %}
+                <p>Data di inizio: <strong>{{ abbonamento_attivo.data_inizio }}</strong></p>
+                <p>Data di fine: <strong>{{ abbonamento_attivo.data_fine }}</strong></p>
+
+        </div>
+
+    {% else %}
+
+        <div class="container-abbonamenti">
+
+            
+
+            <p class="no-abbonamento">
+                Nessun abbonamento attivo
+            </p>
+        </div>
+    {% endif %}
+</div>
+
+    <h2>I nostri Abbonamenti</h2>
+    {% for abbonamento in abbonamenti %}
+
+        <div class="paziente-card">
+
+            <h3>{{ abbonamento.nome }}</h3>
+
+            <p class="descrizione">
+                {{ abbonamento.descrizione }}
+            </p>
+
+            <p>
+                Durata: <strong>{{ abbonamento.durata }} giorni</strong>
+            </p>
+
+            {% with prezzo=abbonamento.listini_prezzi_set.last %}
+                {% if prezzo %}
+                    <div class="prezzo">
+                        Prezzo: {{ prezzo.prezzo }} €
+                        <br> <br>
+                         <div id="overlay" class="modal-overlay" onclick="chiudiModal()"></div>
+                        <button class="btn-add" style="border:none"
+                                onclick="apriModal('{{ prezzo.prezzo }}', '{{ abbonamento.id_abbonamento }}', '{{ abbonamento.nome }}', '{{ abbonamento.durata }}'
+                                                    , '{{ abbonamento.descrizione }}'
+                                )">
+                                    Acquista
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="prezzo">
+                        Prezzo non disponibile
+                        <br> <br>
+                        <a class="btn-acquista">Attualmente non disponibie</a>
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+    {% endfor %}
+<div id="modalAlt"
+     style="display:none; position:fixed; top:20%; left:50%;
+            transform:translateX(-50%);
+            background:white; padding:25px;
+            border-radius:10px;
+            box-shadow:0 0 20px rgba(0,0,0,0.3);
+            z-index:1000; width: 400px;">
+
+    <h3 id="titoloModal"></h3>
+
+    <div id="contenutoModal"></div>
+</div>
+<a id="url-template"
+   data-url="{% url 'acquista_abbonamento' 'PLACEHOLDER' %}">
+</a>
+<script>
+function apriModal(prezzo, id_abbonamento, nome_abbonamento, durata_abbonamento, descrizione_abbonamento) {
+
+    document.getElementById('titoloModal').innerText =
+        "Pagamento " + nome_abbonamento;
+
+    const contenuto = document.getElementById('contenutoModal');
+    const partnerInput = document.getElementById("partner_id");
+    const partner = partnerInput ? partnerInput.value : null;
+    const baseUrl = document.getElementById('url-template').dataset.url;
+    console.log("PArtner:", partner)
+    let url = baseUrl.replace('PLACEHOLDER', id_abbonamento);
+    if (partner) {
+        url = `${url}?partner_id=${partner}`;
+    }
+    console.log(url)
+    contenuto.innerHTML = `
+        <h4>Riassunto</h4>
+        <p>Descrizione: ${descrizione_abbonamento}</p>
+        <p>Durata: ${durata_abbonamento} giorni</p>
+        <p>Prezzo: ${prezzo} </p>
+
+        <a href="${url}" class="btn-add">
+            Paga ora
+        </a>
+
+        <a onclick="chiudiModal()" class="btn-add">
+            Chiudi
+        </a>
+    `;
+
+    document.getElementById('modalAlt').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+}
+
+function chiudiModal() {
+    document.getElementById('modalAlt').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+</script>
+<script>
+function cercaPartner() {
+    const email = document.querySelector("input[name='partner_email']").value;
+
+    fetch(`/nutricare/utente-by-email/?email=${email}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("partner_id").value = data.email;
+                document.getElementById("referral_msg").innerText =
+                    "Partner trovato: " + data.nome;
+                console.log("Trovato")
+            } else {
+                document.getElementById("referral_msg").innerText =
+                    "Utente non trovato";
+            }
+        });
+}
+</script>
+{% endblock %}

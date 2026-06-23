@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Nuovo Piano Alimentare: {{ paziente.nome }} {{ paziente.cognome }}</h1>
+    <a href="{% url 'dashboard_nutrizionista' %}">Torna alla dashboard</a>
+
+    <form method="POST" style="margin-top: 20px;">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+
+        <button type="submit" class="btn-add">Crea</button>
+    </form>
+
+    <h2>Storico Piani Precedenti</h2>
+    {% if storico_piani %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Data Inizio</th>
+                    <th>Data Archiviazione</th>
+                    <th>Obiettivo</th>
+                    <th>Dettagli</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for piano in storico_piani %}
+                <tr>
+                    <td>{{ piano.data_inizio}}</td>
+                    <td>{{ piano.data_fine|default:"N.D." }}</td>
+                    <td>{{ piano.obiettivo }}</td>
+                    <td><a href="{% url 'gestisci_piano' paziente.email piano.pk %}">Visualizza Dettagli</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessun piano archiviato per questo paziente.</p>
+    {% endif %}
+{% endblock %}

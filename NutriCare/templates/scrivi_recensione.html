@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    /* Contenitore principale */
+.feedback-section {
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+
+
+/* Form */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Label */
+form label {
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Input, textarea e select */
+form input,
+form textarea,
+form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dcdde1;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+    outline: none;
+    border-color: #27ae60;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.15);
+}
+
+/* Textarea */
+form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Bottone */
+.btn-primary {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #219150;
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Messaggio recensione già inviata */
+.feedback-section .gia_inserito{
+    display: block;
+    background: #e8f8ef;
+    color: #1e8449;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+
+</style>
+<h2>Storico e Feedback</h2>
+
+<a href="{% url 'dashboard_paziente' %}">Torna alla dashboard</a>
+
+    {% for r in recensioni %}
+        <div class="feedback-section">
+            <p>Hai già recensito per {{ r.nutrizionista.nome }} {{ r.nutrizionista.cognome }}. Grazie per il tuo feedback!</p>
+            <p class="gia_inserito">Commento: {{r.commento}}</p>
+            <p class="gia_inserito">Stelle: {{r.stelle}}/5</p> 
+        </div>  
+    {% endfor %}
+
+
+    {% if nutrizionista%}
+        {% if not gia_recensito %}
+        <div class="feedback-section">
+            {% if nutrizionista.sesso == "M" %}
+                <div class="info-nutrizionista">
+                    <p>Inserisci una recensione per il Dott. <strong>{{ nutrizionista.nome }} {{ nutrizionista.cognome }}</strong></p>
+                </div>
+            {% else %}
+                <div class="info-nutrizionista">
+                    <p>Inserisci una recensione per la Dott.ssa <strong>{{ nutrizionista.nome }} {{ nutrizionista.cognome }}</strong></p>
+                </div>
+            {% endif %}
+        {% endif %}
+        
+        {% if not gia_recensito %}
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn-primary">Invia Recensione</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p>Non risultano piani attivi associati a un nutrizionista per poter inviare una recensione.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

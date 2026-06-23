@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .return {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #27ae60;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+    .return:hover {
+        color: #219150;
+        transform: translateX(-3px);
+    }
+</style>
+
+<a class="return" href="{% url 'dettaglio_paziente' paziente.email %}">Torna alla scheda</a>
+    <h1>Rilevazioni: {{ paziente.nome }} {{ paziente.cognome }}</h1>
+    
+    <form method="POST" id="form-rilevazioni">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        {% if formset.non_form_errors %}
+            <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+                {% for error in formset.non_form_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <table class="table-form" id="table-rilevazioni">
+            <thead>
+                <tr>
+                    <th>Elimina</th><th>Data</th><th>Peso</th><th>Altezza</th><th>Massa Grassa</th><th>Note</th>
+                </tr>
+            </thead>
+            <tbody id="form-container">
+                {% for form in formset %}
+                <tr class="form-row">
+                    <td>{{ form.DELETE }}</td>
+                    <td>{{ form.id }}{{ form.data_rilevazione }}</td>   
+                    <td>{{ form.peso }}</td>
+                    <td>{{ form.altezza }}</td>
+                    <td>{{ form.perc_massa_grassa }}</td>
+                    <td>{{ form.commento }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table style="display:none;">
+            <tbody id="empty-form-template">
+                <tr class="form-row">
+                    <td>{{ formset.empty_form.DELETE }}</td>
+                    <td>{{ formset.empty_form.id }}{{ formset.empty_form.data_rilevazione }}</td>
+                    <td>{{ formset.empty_form.peso }}</td>
+                    <td>{{ formset.empty_form.altezza }}</td>
+                    <td>{{ formset.empty_form.perc_massa_grassa }}</td>
+                    <td>{{ formset.empty_form.commento }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <button type="button" id="add-row" class="btn-add">+ Aggiungi Rilevazione</button>
+        <button type="submit" class="btn-add">Salva</button>
+    </form>
+
+    <script>
+        const addBtn = document.getElementById('add-row');
+        const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+        const container = document.getElementById('form-container');
+        const template = document.getElementById('empty-form-template').innerHTML;
+
+        addBtn.addEventListener('click', () => {
+            let formNum = parseInt(totalForms.value);
+            // Sostituiamo il segnaposto __prefix__ con il nuovo indice
+            let newRow = template.replace(/__prefix__/g, formNum);
+            container.insertAdjacentHTML('beforeend', newRow);
+            totalForms.value = formNum + 1;
+        });
+    </script>
+{% endblock %}

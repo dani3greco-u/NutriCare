@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<a href="{% url 'dashboard_paziente' %}">Torna alla dashboard</a>
+<div class="container">
+    <h2>Il tuo storico</h2>
+
+    <h3>Piani Alimentari</h3>
+    {% if piani %}
+        <table class="table-form">
+            <thead>
+                <tr>
+                    <th>Obiettivo</th>
+                    <th>Data Inizio</th>
+                    <th>Data Fine</th>
+                    <th>Stato</th>
+                    <th>Dettagli</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for piano in piani %}
+                <tr>
+                    <td>{{ piano.obiettivo }}</td>
+                    <td>{{ piano.data_inizio }}</td>
+                    <td>{{ piano.data_fine|default:"-" }}</td>
+                    <td>{{ piano.stato }}</td>
+                    <td><a href="{% url 'visualizza_piano' pk=piano.pk %}" class="btn btn-sm btn-primary">Dettagli</a></td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessun piano alimentare trovato.</p>
+    {% endif %}
+
+
+    <h3>Rilevazioni Peso</h3>
+    {% if rilevazioni %}
+        <table class="table-form">
+            <thead><tr><th>Data</th><th>Peso (kg)</th><th>% Massa Grassa</th></tr></thead>
+            <tbody>
+                {% for ril in rilevazioni %}
+                <tr>
+                    <td>{{ ril.data_rilevazione }}</td>
+                    <td>{{ ril.peso }}</td>
+                    <td>{{ ril.perc_massa_grassa }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna rilevazione trovata.</p>
+    {% endif %}
+
+    <h3>Acquisti</h3>
+    {% if acquisti %}
+        <table class="table-form">
+            <thead><tr>
+                <th>Data</th>
+                <th>Prezzo Pagato</th>
+                <th>Abbonamento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in acquisti %}
+                <tr>
+                    <td>{{ a.data_acquisto }}</td>
+                    <td>{{ a.prezzo_pagato }} €</td>
+                    <td>{{ a.abbonamento.nome }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessun acquisto trovato.</p>
+    {% endif %}
+</div>
+{% endblock %}

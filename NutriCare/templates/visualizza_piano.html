@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<a href="{% url 'dashboard_paziente' %}">Torna alla dashboard</a>
+<div class="container" style="max-width: 800px; margin: auto;">
+    
+        
+        <h2>Piano Alimentare: {{ piano.nome_piano }}</h2>
+        <p>Periodo: {{ piano.data_inizio }} - {{ piano.data_fine }}</p> 
+        <p>Nutrizionista: {{piano.nutrizionista}}</p>
+        <p>Stato: <strong>{{ piano.stato }}</strong></p>
+        {% for giornata in piano.giornate.all %}
+            <div class="giornata-card" style="border: 1px solid #ddd; margin: 20px 0; padding: 15px; border-radius: 8px; border-left: 5px solid #27ae60" >
+                <div style="border-bottom: 1px solid #2c3e50; margin-bottom: 10px; padding-bottom: 5px;">   
+                    <h3>Giorno {{ giornata.n_giorno }}</h3>
+                    <p>Calorie Target: <strong>{{ giornata.calorie_target }}</strong></p>
+                    {% if giornata.note %}
+                        <p>Note: {{ giornata.note }}</p>
+                    {% endif %}
+                </div>
+                
+                {% for pasto in giornata.pasti.all  %}
+                    <div style="margin-top: 10px; padding: 10px; background: #f9f9f9;">
+                        <strong>{{ pasto.nome }}</strong> ({{ pasto.calorie_totali }} kcal)
+                        <ul>
+                            {% for inclusione in pasto.inclusioni.all %}
+                                <li>
+                                    {{ inclusione.alimento.nome }} - {{ inclusione.grammatura }}g
+                                    {% if piano.stato == "Attivo" %}
+                                        <button type="button" 
+                                        onclick="apriModal('{{ inclusione.alimento.id_alimento }}', '{{ inclusione.alimento.nome }}', '{{pasto.id}}')"
+                                            style="margin-left: 10px; cursor: pointer;">
+                                            Cambia
+                                        </button>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <div id="overlay" class="modal-overlay" onclick="chiudiModal()"></div>
+        {% if piano.stato == "Attivo" %}
+            <div id="modalAlt" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%); background:white; padding:25px; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.3); z-index:1000; width: 400px;">
+                <h3 id="titoloModal">Alternative</h3>
+                <div id="contenutoModal"></div>
+                <button onclick="chiudiModal()" class="btn-primary" style="margin-top:15px;">Chiudi</button>
+            </div>
+        </div>
+        {% endif %}
+    
+</div>
+<script>
+function apriModal(id, nome, pastoid) {
+    document.getElementById('titoloModal').innerText = "Alternative per: " + nome;
+    
+    fetch(`/nutricare/trova-alternative/${id}/piano/${pastoid}`)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('contenutoModal');
+            container.innerHTML = data.alternative.length > 0 
+                ? data.alternative.map(a =>
+                    `<p style="margin:5px 0;">
+                        • ${a.nome} (in proporzione ${a.grammi} g)
+                    </p>`
+                ).join('')
+                : "<p>Nessuna alternativa trovata.</p>";
+            
+            // Mostra sia modale che overlay
+            document.getElementById('modalAlt').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        });
+}
+
+function chiudiModal() {
+    document.getElementById('modalAlt').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+</script>
+{% endblock %}

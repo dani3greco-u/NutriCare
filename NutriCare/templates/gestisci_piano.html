@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Piano Alimentare: {{ paziente.nome }} {{ paziente.cognome }}</h1>
+    <a class="return" href="{% url 'dettaglio_paziente' paziente.email %}">Torna al profilo</a>
+
+    {% if is_readonly %}
+        <div style="background: #f8d7da; color: #721c24; padding: 10px; margin: 10px 0; border-radius: 5px;">
+            <strong>Modalità Sola Lettura:</strong> Questo piano non può essere modificato.
+        </div>
+    {% endif %}
+
+    <div class="piano-card" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
+        <h3>Piano Alimentare {% if is_readonly %}Archiviato{% else %}Attivo{% endif %}</h3>
+        <p><strong>Obiettivo:</strong> {{ piano.obiettivo }}</p>
+        <p><strong>Iniziato il:</strong> {{ piano.data_inizio }}</p>
+    </div>
+
+    <form method="POST" id="form-piano">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        <table class="table-form" id="table-giornate">
+            <thead>
+                <tr>
+                    <th>Azioni</th>
+                    {% if not is_readonly %}<th>Elimina</th>{% endif %}
+                    <th>Calorie Target</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody id="giornate-container">
+                {% for g_form in formset %}
+                <tr>
+                    <td>
+                        {% if g_form.instance.pk %}
+                            <a href="{% url 'gestisci_pasti' g_form.instance.pk %}" class="btn btn-sm btn-primary">Gestisci Pasti</a>
+                        {% else %}
+                            <small>Salva prima</small>
+                        {% endif %}
+                    </td>
+                    {% if not is_readonly %}<td>{{ g_form.DELETE }}</td>{% endif %}
+                    
+                    <!-- Campo nascosto per l'ID e il Giorno -->
+                    <td style="display:none;">
+                        {{ g_form.id }}
+                        {{ g_form.n_giorno }}
+                    </td>
+                    
+                    <td>{{ g_form.calorie_target }}</td>
+                    <td>{{ g_form.note }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not is_readonly %}
+            <br>
+            <button type="button" id="add-row" class="btn-add">+ Aggiungi Giorno</button>
+            <button type="submit" class="btn-add">Salva Giornate</button>
+        {% endif %}
+    </form>
+
+    <script type="text/template" id="empty-row-template">
+        <tr>
+            <td><small>Salva prima</small></td>
+            <td>{{ formset.empty_form.DELETE }}</td>
+            <td style="display:none;">
+                {{ formset.empty_form.id }}
+                {{ formset.empty_form.n_giorno }}
+            </td>
+            <td>{{ formset.empty_form.calorie_target }}</td>
+            <td>{{ formset.empty_form.note }}</td>
+        </tr>
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addBtn = document.getElementById('add-row');
+            if(!addBtn) return; // Se readonly, il tasto non esiste
+
+            const container = document.getElementById('giornate-container');
+            const totalForms = document.getElementById('id_giornate-TOTAL_FORMS');
+            const template = document.getElementById('empty-row-template').innerHTML;
+
+            addBtn.addEventListener('click', function() {
+                let formNum = parseInt(totalForms.value);
+                let newRow = template.replace(/__prefix__/g, formNum);
+                
+                container.insertAdjacentHTML('beforeend', newRow);
+                
+                // Popolamento automatico del Giorno
+                let nGiornoField = container.querySelector(`[name="giornata_tipo_set-${formNum}-n_giorno"]`);
+                if (nGiornoField) {
+                    nGiornoField.value = formNum + 1;
+                }
+                
+                totalForms.value = formNum + 1;
+            });
+        });
+    </script>
+{% endblock %}

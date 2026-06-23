@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .return {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #27ae60;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+    .return:hover {
+        color: #219150;
+        transform: translateX(-3px);
+    }
+</style>
+<h1>{{ giornata.n_giorno }}</h1>
+<a class="return" href="{% url 'gestisci_piano' giornata.piano.paziente.email giornata.piano.pk %}">Torna al piano</a>
+
+{% if is_readonly %}
+    <div style="background: #f8d7da; color: #721c24; padding: 10px; margin: 10px 0; border-radius: 5px;">
+        <strong>Modalità Sola Lettura:</strong> Questo piano è archiviato e non può essere modificato.
+    </div>
+{% endif %}
+
+<form method="POST" id="pasti-form">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    
+    <table class="table-form">
+        <thead>
+            <tr>
+                {% if not is_readonly %}<th>Elimina</th>{% endif %}
+                <th>Nome Pasto</th>
+                <th>Orario</th>
+                <th>Calorie</th>
+                <th>Proteine</th>
+                <th>Carboidrati</th>
+                <th>Grassi</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody id="pasti-container">
+            {% for form in formset %}
+                <tr>
+                    {{ form.id }}
+                    {% if not is_readonly %}<td>{{ form.DELETE }}</td>{% endif %}
+                    <td>{{ form.nome }}</td>
+                    <td>{{ form.orario_consigliato }}</td>
+                    <td class="macro-cell">{{ form.macro.calorie|default:0|floatformat:1 }} kcal</td>
+                    <td class="macro-cell">{{ form.macro.proteine|default:0|floatformat:1 }}g</td>
+                    <td class="macro-cell">{{ form.macro.carboidrati|default:0|floatformat:1 }}g</td>
+                    <td class="macro-cell">{{ form.macro.grassi|default:0|floatformat:1 }}g</td>
+                    <td>
+                        {% if form.instance.pk %}
+                            <a href="{% url 'gestisci_alimenti' form.instance.pk %}" class="btn btn-sm btn-primary">
+                                {% if is_readonly %}Visualizza Alimenti{% else %}Alimenti{% endif %}
+                            </a>
+                        {% else %}
+                            <small>Salva per gestire</small>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totali-giornata" style="margin-top: 20px; padding: 15px; background: #f4f4f4; border-radius: 8px;">
+        <h3>Totale Giornaliero:</h3>
+        <p>
+            <strong>Calorie:</strong> {{ totali.calorie|floatformat:1 }} kcal (rimanenti: {{ rimanenti|floatformat:1}} kcal) | 
+            <strong>Proteine:</strong> {{ totali.proteine|floatformat:1 }}g | 
+            <strong>Carboidrati:</strong> {{ totali.carboidrati|floatformat:1 }}g | 
+            <strong>Grassi:</strong> {{ totali.grassi|floatformat:1 }}g
+        </p>
+    </div>
+
+    {% if not is_readonly %}
+        <br>
+        <button type="button" id="add-pasto" class="btn-add">+ Aggiungi Pasto</button>
+        <button type="submit" class="btn-add">Salva Modifiche</button>
+    {% endif %}
+</form>
+
+{% if not is_readonly %}
+    <script type="text/html" id="pasto-template">
+        <tr>
+            <td>{{ formset.empty_form.DELETE }}</td>
+            <td>{{ formset.empty_form.nome }}</td>
+            <td>{{ formset.empty_form.orario_consigliato }}</td>
+            <td>0.0 kcal</td>
+            <td>0.0 g</td>
+            <td>0.0 g</td>
+            <td>0.0 g</td>
+            <td><small>Salva per gestire</small></td>
+        </tr>
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addBtn = document.getElementById('add-pasto');
+            const container = document.getElementById('pasti-container');
+            const totalForms = document.getElementById('id_pasti-TOTAL_FORMS');
+            const template = document.getElementById('pasto-template').innerHTML;
+
+            addBtn.addEventListener('click', function() {
+                let formNum = parseInt(totalForms.value);
+                let newRowHtml = template.replace(/__prefix__/g, formNum);
+                container.insertAdjacentHTML('beforeend', newRowHtml);
+                totalForms.value = formNum + 1;
+            });
+        });
+    </script>
+{% endif %}
+{% endblock %}

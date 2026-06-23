@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<a href="{% url 'dashboard_nutrizionista' %}">Torna alla Dashboard</a>
+<h2>Associa Paziente Esistente</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label>Inserisci l'email del paziente:</label>
+        <input type="email" name="email" class="form-control" placeholder="paziente@email.it" required>
+    </div>
+    <button type="submit" class="btn-primary">Associa al mio profilo</button>
+</form>
+{% endblock %}

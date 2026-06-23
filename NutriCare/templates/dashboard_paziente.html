@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    {% if paziente.sesso == 'M' %} 
+    <h2>Benvenuto, {{ paziente.nome }} {{ paziente.cognome }}</h2>
+    {% else %}
+        <h2>Benvenuta, {{ paziente.nome }} {{ paziente.cognome }}</h2>
+    {% endif %}
+    <a href="{% url 'storico_paziente' %}" class="btn-add">Storico</a>
+    <a href="{% url 'scrivi_recensione' %}" class="btn-add">Feedback</a>
+    <a href="{% url 'abbonamenti' %}" class="btn-add">Acquisti</a>
+    
+
+    <div class="paziente-card">  
+        {% if abbonamento_attivo %}
+                <h3>Il tuo Abbonamento Attivo</h3>
+                <p>Nome: <strong>{{ abbonamento_attivo.abbonamento.nome }}</strong></p>
+                {% if abbonamento_attivo.abbonamento.descrizione %} 
+                    <p>Descrizione: <strong>{{ abbonamento_attivo.abbonamento.descrizione }}</strong></p>
+                {% endif %}
+                <p>Data di inizio: <strong>{{ abbonamento_attivo.data_inizio }}</strong></p>
+                <p>Data di fine: <strong>{{ abbonamento_attivo.data_fine }}</strong></p>
+                
+        {% else %}
+                Il tuo abbonamento è scaduto.
+                <br> <br>
+                <a href="{% url 'abbonamenti' %}">
+                    Rinnova ora
+                </a>
+        {% endif %}
+    </div>
+
+     <div class="paziente-card">  
+        {% if piano %}
+            <a href="{% url 'visualizza_piano' pk=piano.pk %}">
+                <h3>Il tuo Piano Alimentare Attivo</h3>
+            </a>
+            <p>Stato: <strong>{{ piano.stato }}</strong></p>
+            <p>Data di inizio: <strong>{{ piano.data_inizio }}</strong></p>
+            <p>Obiettivo: <strong>{{ piano.obiettivo }}</strong></p>
+        {% else %}
+            <p>Nessun piano attivo al momento.</p>
+        {% endif %}
+    </div>
+
+    <div class="card-grafico">
+        <canvas id="pesoChart"></canvas>
+    </div>
+
+   
+
+    <div class="card-grafico">
+        <canvas id="pesoChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+     const date = JSON.parse('{{ date_json|safe }}');
+    const pesi = JSON.parse('{{ pesi_json|safe }}');
+
+    const ctx = document.getElementById('pesoChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: date,
+            datasets: [{
+                label: 'Peso (kg)',
+                data: pesi,
+                borderColor: '#3498db',
+                tension: 0.3
+            }]
+        }
+    });
+</script>
+{% endblock %}

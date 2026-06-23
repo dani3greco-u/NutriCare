@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<body>
+
+    <h1>{{ paziente.nome }} {{ paziente.cognome }}</h1>
+    <a href="{% url 'dashboard_nutrizionista' %}">Torna alla Dashboard</a>
+    <br>
+    <br>
+
+    <div class="actions">
+        <a href="{% url 'gestisci_rilevazioni' paziente.email %}" class="btn-add">Storico Rilevazioni</a>
+        <a href="{% url 'crea_piano' paziente.email %}" class="btn-add">Crea Nuovo Piano Alimentare</a>
+        
+    </div>
+
+    <div class="paziente-card">
+        <h3>Profilo</h3>
+        <p>Sesso: {{paziente.sesso}}</p>
+        <p> Età: {{paziente.eta}}</p>
+        {% if paziente.allergie.all %}
+            <p>Allergie:</p>
+            <ul class="allergie-list">
+                {% for allergia in paziente.allergie.all %}
+                    <li>{{ allergia.nome }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if paziente.note_cliniche %}
+            <p>Note: {{paziente.note_cliniche}}</p>
+        {% endif %}
+    </div>
+
+    <div class="paziente-card">
+        {% if piano_attivo %}
+            <a href="{% url 'gestisci_piano' paziente.email piano_attivo.pk %}"><h3>Piano Alimentare Attivo</h3></a>
+            <p><strong>Obiettivo:</strong> {{ piano_attivo.obiettivo }}</p>
+            <p><strong>Iniziato il:</strong> {{ piano_attivo.data_inizio }}</p>
+        {% else %}
+            <p>Nessun piano attivo.</p>
+        {% endif %}
+    </div>
+
+    <div class="paziente-card">
+        <div class="paziente-peso">
+            <h3>Andamento Peso</h3>
+            <canvas id="pesoChart" width="400" height="150"></canvas>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                // JSON.parse trasforma la stringa JSON in un vero oggetto JavaScript
+                const date = JSON.parse('{{ date_json|safe }}');
+                const pesi = JSON.parse('{{ pesi_json|safe }}');
+
+                const ctx = document.getElementById('pesoChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: date,
+                        datasets: [{
+                            label: 'Peso (kg)',
+                            data: pesi,
+                            borderColor: '#3498db',
+                            tension: 0.3
+                        }]
+                    }
+                });
+            </script>
+        </div>
+    </div>
+    
+
+    <h3>Storico Rilevazioni</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Peso (kg)</th>
+                <th>Massa Grassa (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in rilevazioni %}
+            <tr>
+                <td>{{ r.data_rilevazione|date:"d/m/Y" }}</td>
+                <td><strong>{{ r.peso }}</strong></td>
+                <td>{{ r.perc_massa_grassa }}%</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">Nessuna rilevazione registrata.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Registra Nuovo Paziente</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Salva Paziente</button>
+    </form>
+    <a href="{% url 'dashboard_nutrizionista' %}">Torna indietro</a>
+</body>
+</html>
+{% endblock %}

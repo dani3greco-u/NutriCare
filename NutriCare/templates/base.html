@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>{% block title %}NutriCare{% endblock %}</title>
+</head>
+<body>
+    {% if not request.resolver_match.url_name == 'login' %}
+        <header>
+            <div class="container" style="max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+            
+            <div style="font-size: 16px;">
+                {% if request.session.role %}
+                    <span>Utente: <strong>{{ request.session.email }}</strong></span>
+                {% endif %}
+            </div>
+
+            <div style="flex-grow: 1;"></div>
+
+            <div>
+                {% if request.session.role %}
+                    <a href="{% url 'logout' %}" style="color: #e74c3c; text-decoration: none; font-weight: bold; padding: 5px 10px; border: 1px solid #e74c3c; border-radius: 4px;">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" style="color: #27ae60; text-decoration: none; font-weight: bold; padding: 5px 10px; border: 1px solid #27ae60; border-radius: 4px;">Accedi</a>
+                {% endif %}
+            </div>
+
+        </div>
+        </header>
+        <br>
+    {% endif %}
+    <div class="dashboard-container">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+    
+</body>
+</html>

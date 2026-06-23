@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .return {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #27ae60;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+    .return:hover {
+        color: #219150;
+        transform: translateX(-3px);
+    }
+</style>
+
+<h1>{{ pasto.nome }}</h1>
+<a class="return" href="{% url 'gestisci_pasti' pasto.giornata.pk %}">Torna al pasto</a>
+{% if is_readonly %}
+    <div style="background: #f8d7da; color: #721c24; padding: 10px; margin: 10px 0; border-radius: 5px;">
+        <strong>Modalità Sola Lettura:</strong> Questo piano è archiviato e non può essere modificato.
+    </div>
+{% endif %}
+<form method="POST">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    
+    <table class="table-form">
+        <thead>
+            <tr>
+                <th>Elimina</th>
+                <th>Alimento</th>
+                <th>Grammatura (g)</th>
+            </tr>
+        </thead>
+        <tbody id="alimenti-container">
+            {% for a_form in formset %}
+            <tr>
+                <td style="display:none;">{{ a_form.id }}</td>
+                <td>{{ a_form.DELETE }}</td>
+                <td>{{ a_form.alimento }}</td>
+                <td>{{ a_form.grammatura }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+
+    {% if not is_readonly %}
+        <button type="button" id="add-alimento" class="btn-add">+ Aggiungi Alimento</button>
+        <button type="submit" class="btn-add">Salva Alimenti</button>
+        <table style="display:none;", class="table-form">
+            <tbody id="empty-row-template">
+                <tr>
+                    <td>{{ formset.empty_form.DELETE }}</td>
+                    <td>{{ formset.empty_form.alimento }}</td>
+                    <td>{{ formset.empty_form.grammatura }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+</form>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addBtn = document.getElementById('add-alimento');
+            const container = document.querySelector('#alimenti-container');
+            const totalForms = document.getElementById('id_inclusioni-TOTAL_FORMS');
+            const template = document.getElementById('empty-row-template').innerHTML;
+
+            addBtn.addEventListener('click', function() {
+                let formNum = parseInt(totalForms.value);
+                let newRow = template.replace(/__prefix__/g, formNum);
+                container.insertAdjacentHTML('beforeend', newRow);
+                totalForms.value = formNum + 1;
+            });
+        });
+    </script>
+{% endblock %}
