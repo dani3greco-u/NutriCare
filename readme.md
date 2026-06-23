@@ -40,7 +40,7 @@ venv\Scripts\activate
 
 Il progetto utilizza un database MySQL denominato `NutriCare`.
 
-**Importante:
+**Importante**:
 
 Il server MySQL deve essere in esecuzione.
 Il database NutriCare deve essere già presente sulla macchina prima dell'avvio dell'applicazione.
